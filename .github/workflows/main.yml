@@ -25,6 +25,9 @@ jobs:
 
       - name: Set executable permissions for gradlew
         run: chmod +x backend/EasyMoneyMapApi/gradlew
+      - name: Set Environment Variables
+        run: echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
+
 
       - name: Build Backend
         run: |
