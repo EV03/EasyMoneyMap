@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Backend Tests
         run: |
-          cd backend/easyMoneyApi
+          cd backend/EasyMoneyMapApi
           ./gradlew test
 
   frontend:
