@@ -12,6 +12,7 @@ package com.example.easymoneymapapi.controller;
         import org.springframework.web.bind.annotation.*;
         import com.example.easymoneymapapi.exception.ValidationException;
 
+        import java.security.Principal;
         import java.util.HashMap;
         import java.util.Map;
 
@@ -45,8 +46,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register( @RequestBody UserRegistrationDTO userReq) {
 
-        Map<String, String> errors = new HashMap<>();
         // Manuelle Validierung (Spring validation läuft nicht)
+
+        Map<String, String> errors = new HashMap<>();
+
+        if(!userReq.getAgb()) {
+            errors.put("agb", "AGB müssen akzeptiert werden");
+        }
+
         if (userReq.getUsername() == null || userReq.getUsername().isBlank()) {
             errors.put("username", "Username muss angegeben werden");
         } else if (userReq.getUsername().length() < 4 || userReq.getUsername().length() > 20) {
@@ -57,6 +64,7 @@ public class AuthController {
             errors.put("password", "Es muss ein Passwort angegeben werden");
         } else if (userReq.getPassword().length() < 8 || userReq.getPassword().length() > 20) {
             errors.put("password", "Passwort muss zwischen 8 und 20 Zeichen groß sein");
+
         } else if (!userReq.getPassword().matches("^(?=.*[0-9])(?=.*[a-zA-Z]).{8,20}$")) {
             errors.put("password", "Passwort muss mindestens eine Zahl und einen Buchstaben enthalten");
         }
@@ -84,8 +92,7 @@ public class AuthController {
             throw new ValidationException("Validierungsfehler",errors);
         }
 
-        UserInfo user = userReq.mapToUserInfo();
-        userService.registerUser(user);
+        userService.registerUser(userReq.mapToUserInfo());
         return ResponseEntity.ok("Benutzer erfolgreich registriert");
     }
 
@@ -102,4 +109,16 @@ public class AuthController {
             String token = authService.authenticateAndGenerateToken(authRequest.getUsername(), authRequest.getPassword());
             return ResponseEntity.ok(new JwtResponse(token));
     }
+    /**
+     * löscht den aktuellen eingeloggten Benutzer
+     *
+     * @param principal der aktuelle Benutzer
+     * @return eine Bestätigungsmeldung
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(Principal principal) {
+        userService.deleteUser(principal.getName());
+        return ResponseEntity.ok("Benutzer erfolgreich gelöscht");
+    }
 }
+

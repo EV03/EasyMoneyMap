@@ -33,6 +33,8 @@ public class UserRegistrationDTO {
     //@Size(max = 20, message = "Nachname darf nur bis zu 20 Zeichen haben")
     private String lastName;
 
+    private Boolean agb;
+
 
     public UserInfo mapToUserInfo( ) {
 
@@ -45,4 +47,5 @@ public class UserRegistrationDTO {
         return user;
 
     }
+
 }

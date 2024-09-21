@@ -2,6 +2,7 @@ package com.example.easymoneymapapi.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -75,6 +76,18 @@ public class GlobalExceptionHandler {
         Map<String, String> response = new HashMap<>();
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Behandelt die Ausnahme, wenn ein Benutzer nicht gefunden wird
+     * @param ex die ausgelöste UsernameNotFoundException
+     * @return ResponseEntity mit einer Fehlermeldung im JSON-Format und dem HTTP-Status '404 NOT FOUND'
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
 
