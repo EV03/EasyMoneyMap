@@ -12,10 +12,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.easymoneymapapi.security.UserInfoDetails;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
 class UserServiceTest {
 
     @Mock
@@ -99,9 +100,9 @@ class UserServiceTest {
     @Test
     void loadByUsername_success() {
 
-        UserInfo user = new UserInfo();
-        user.setUsername("testuser");
-        user.setPassword("password");
+        Optional<UserInfo> user = Optional.of(new UserInfo());
+        user.get().setUsername("testuser");
+        user.get().setPassword("password");
 
         when(userRepository.findByUsername("testuser")).thenReturn(user);
 

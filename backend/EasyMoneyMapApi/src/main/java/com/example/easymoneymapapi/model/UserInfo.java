@@ -1,13 +1,12 @@
 package com.example.easymoneymapapi.model;
 import com.example.easymoneymapapi.dto.UserRegistrationDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -30,4 +29,10 @@ public class UserInfo {
 
     private String lastName;
     // private String roles;
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserEvent> userEvents = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private Set<UserKauf> userPurchases = new HashSet<>();
 }

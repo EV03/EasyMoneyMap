@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -18,6 +21,9 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+    @Transactional
     public UserInfo registerUser(UserInfo user) {
         if(userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistsException("Username wird bereits verwendet");
@@ -37,18 +43,17 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserInfo user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User nicht gefunden mit Username: " + username);
-        }
+        UserInfo user = userRepository.findByUsername(username).
+                orElseThrow(() -> new UsernameNotFoundException("User nicht gefunden mit Username: " + username));
+
         return new UserInfoDetails(user);
     }
 
+    @Transactional
     public void deleteUser(String username) {
-        UserInfo user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Zugriff");
-        }
+        UserInfo user = userRepository.findByUsername(username).
+                orElseThrow(() -> new UsernameNotFoundException("User nicht gefunden mit Username: " + username));
+
         userRepository.delete(user);
     }
 }

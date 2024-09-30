@@ -4,9 +4,12 @@ package com.example.easymoneymapapi.repository;
 import com.example.easymoneymapapi.model.UserInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 // testet Datenbankzugriff
@@ -24,12 +27,11 @@ public class UserRepositoryIntegrationTest {
         user.setEmail("test@example.com");
         userRepository.save(user);
 
-        UserInfo foundUser = userRepository.findByUsername("testuser");
+        Optional<UserInfo> foundUser = userRepository.findByUsername("testuser");
 
-        assertThat(foundUser).isNotNull();
-        assertThat(foundUser.getUsername()).isEqualTo("testuser");
+        assertTrue(foundUser.isPresent(), "Benutzer sollte gefunden werden");
+        assertThat(foundUser.get().getUsername()).isEqualTo("testuser");
     }
-
 
     @Test
     public void whenExistsByUsername_thenReturnTrue() {
@@ -43,6 +45,7 @@ public class UserRepositoryIntegrationTest {
 
         assertThat(exists).isTrue();
     }
+
     @Test
     public void whenExistsByEmail_thenReturnTrue() {
         UserInfo user = new UserInfo();
@@ -68,4 +71,5 @@ public class UserRepositoryIntegrationTest {
 
         assertThat(exists).isFalse();
     }
+
 }

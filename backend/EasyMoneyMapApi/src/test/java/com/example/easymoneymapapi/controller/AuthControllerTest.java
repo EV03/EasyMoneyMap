@@ -82,7 +82,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"\",\"password\":\"\"}"))
+                        .content("{\"username\":\"invaliduser\",\"password\":\"invalidpassword1\"}"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").
                         value("Ungültiger Username oder Passwort"));
@@ -94,7 +94,6 @@ public class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").
                         value("Ungültiger Username oder Passwort"));
     }
-
     @Test
     void authenticateAndGetToken_missingFields() throws Exception {
 
@@ -412,8 +411,20 @@ public class AuthControllerTest {
         String token = TestUtils.extractTokenFromResponse(response);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/auth/delete")
-                .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("Benutzer erfolgreich gelöscht"));
+    }
+
+    @Test
+    void authenticateAndGetToken_UsernameTooLong() throws Exception {
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/login").
+                        contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"thisusernameiswaytoolong\",\"password\":\"ValidPassword1\"}"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username").
+                        value("size must be between 4 and 20"));
     }
 }

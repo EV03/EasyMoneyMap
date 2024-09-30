@@ -7,8 +7,10 @@ package com.example.easymoneymapapi.controller;
         import com.example.easymoneymapapi.service.AuthService;
         import com.example.easymoneymapapi.service.JwtService;
         import com.example.easymoneymapapi.service.UserService;
+        import jakarta.validation.Valid;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.ResponseEntity;
+        import org.springframework.validation.annotation.Validated;
         import org.springframework.web.bind.annotation.*;
         import com.example.easymoneymapapi.exception.ValidationException;
 
@@ -104,7 +106,7 @@ public class AuthController {
      * @return ein JWT-Token bei erfolgreicher Authentifizierung
      */
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> authenticateAndGetToken(@Valid @RequestBody AuthRequest authRequest) {
 
             String token = authService.authenticateAndGenerateToken(authRequest.getUsername(), authRequest.getPassword());
             return ResponseEntity.ok(new JwtResponse(token));

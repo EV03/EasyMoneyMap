@@ -22,13 +22,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Behandelt Validierungsfehler, die während der Verarbeitung von Anfragen auftreten.
-     * spring validation funktioniert nicht daher erstmal nicht verwenden
-     * @param ex die ausgelöste MethodArgumentNotValidException
-     * @return eine ResponseEntity mit den Validierungsfehlern
-     */
-   /* @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
@@ -38,10 +32,9 @@ public class GlobalExceptionHandler {
         });
         return ResponseEntity.badRequest().body(errors);
     }
-*/
 
-    /** Behandelt Validierungsfehler, die während der Verarbeitung von Anfragen auftreten.
-     *
+    /** Behandelt Validierungsfehler, die während der Verarbeitung von Registrierungsanfragen auftreten.
+     * (starter validation hat nicht funktioniert)
      * @param ex @param ex die ausgelöste ValidaitonException
      * @return eine ResponseEntity mit HTTP-Status '400-BAD REQUEST'
      */
@@ -51,10 +44,8 @@ public class GlobalExceptionHandler {
         response.put("errors", ex.getErrors());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-
     /**
-     * Behandelt die Ausnahme, die ausgelöst wird, wenn versucht wird, einen Benutzer zu registrieren,
-     * der bereits in der Datenbank existiert.
+     * Behandelt die Ausnahme, wenn ein Benutzer bereits existiert.
      *
      * @param ex die ausgelöste UserAlreadyExistsException, die den Konflikt beschreibt
      * @return ResponseEntity mit einer Fehlermeldung im JSON-Format und dem HTTP-Status '409 CONFLICT'
@@ -65,7 +56,6 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
-
     /**
      * Behandelt die Ausnahme, wenn beim Loginversuch Username und Passwort nicht übereinstimmen
      * @param ex die ausgelöste BadCredentialsException
@@ -77,7 +67,6 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
-
     /**
      * Behandelt die Ausnahme, wenn ein Benutzer nicht gefunden wird
      * @param ex die ausgelöste UsernameNotFoundException
@@ -90,7 +79,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-
     /**
      * Behandelt allgemeine Ausnahmen, die nicht speziell behandelt werden.
      *
@@ -102,6 +90,66 @@ public class GlobalExceptionHandler {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Server Fehler");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    /** Behandelt die Ausnahme, wenn ein Event nicht gefunden wird
+     * @param ex die ausgelöste EventNotFoundException
+     * @return ResponseEntity mit einer Fehlermeldung im JSON-Format und dem HTTP-Status '404 NOT FOUND'
+     */
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleEventNotFoundException(EventNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Behandlet die Ausnahme, wenn ein Event mit gleichen Namen und Datum bereits existiert
+     * @param ex die ausgelöste EventAlreadyExistsException
+     * @return ResponseEntity mit einer Fehlermeldung im JSON-Format und dem HTTP-Status '409 CONFLICT'
+     */
+
+    @ExceptionHandler(EventWithNameAndDateAlreadyExists.class)
+    public ResponseEntity<Map<String, String>> handleEventAlreadyExistsException(EventWithNameAndDateAlreadyExists ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * behandelt die Ausnahme, wenn dateTo vor dateFrom liegt
+     * @param ex die ausgelöste IllegalArgumentException
+     *
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * behandelt die aussnahme, wenn ein User in einem Event nicht gefunden wird
+     * @param ex die ausgelöste UserInEventNotFoundException
+     *
+     */
+    @ExceptionHandler(UserInEventNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserInEventNotFoundException(UserInEventNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * behandelt die Ausnahme, wenn ein unautorisierter Zugriff erfolgt
+     * @param ex die ausgelöste UnauthorizedAccessException
+     * @return ResponseEntity mit einer Fehlermeldung im JSON-Format und dem HTTP-Status '401 UNAUTHORIZED'
+     */
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorizedAccessException(UnauthorizedAccessException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
 }
