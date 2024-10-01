@@ -120,7 +120,23 @@ public class UserEventRepositoryTest {
         assertThat(foundUserEvent).isNotPresent();
     }
 
-    // findByfilters noch testen mit allen möglichen kombinationen von filtern
-
     // findByEventId returnt liste von allen userEvents zu einem event
+    @Test
+    public void findByEventId_returnsListOfUsers() {
+        UserEvent userEvent = new UserEvent();
+        userEvent.setEvent(event);
+        userEvent.setUser(userInfo);
+        userEventRepository.save(userEvent);
+
+        UserEvent userEvent1 = new UserEvent();
+        userEvent1.setEvent(event);
+        UserInfo userInfo1 = new UserInfo();
+        userRepository.save(userInfo1);
+        userEvent1.setUser(userInfo1);
+        userEventRepository.save(userEvent1);
+
+        assertThat(userEventRepository.findByEventId(event.getId())).containsExactlyInAnyOrder(userEvent, userEvent1);
+    }
+
+    // findByfilters noch testen mit allen möglichen kombinationen von filtern
 }

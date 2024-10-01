@@ -3,7 +3,6 @@ package com.example.easymoneymapapi.service;
 import com.example.easymoneymapapi.exception.EventNotFoundException;
 import com.example.easymoneymapapi.exception.EventWithNameAndDateAlreadyExists;
 import com.example.easymoneymapapi.model.Event;
-import com.example.easymoneymapapi.model.UserEvent;
 import com.example.easymoneymapapi.repository.EventRepository;
 import com.example.easymoneymapapi.repository.UserEventRepository;
 import com.example.easymoneymapapi.repository.UserKaufRepository;
@@ -13,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.List;
+
 
 // todo: implementieren
 @Service

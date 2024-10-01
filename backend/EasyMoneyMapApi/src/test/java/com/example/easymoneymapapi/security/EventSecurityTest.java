@@ -51,7 +51,7 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateAddPermission_success() {
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
@@ -67,7 +67,7 @@ public class EventSecurityTest {
     @Test
     public void testValidateAddPermission_userAlreadyExists() {
 
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
 
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
@@ -82,7 +82,7 @@ public class EventSecurityTest {
     @Test
     public void testValidateAddPermission_noPermissionToAddUser() {
         // Mock den Requester als "Member" (keine Berechtigung zum Hinzufügen)
-        requesterUserEvent.setRole(UserEvent.Role.Member);
+        requesterUserEvent.setRole(new Role("Member"));
 
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
@@ -97,12 +97,12 @@ public class EventSecurityTest {
     @Test
     public void testValidateRemovePermission_success() {
 
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
         UserEvent userToRemoveEvent = new UserEvent();
-        userToRemoveEvent.setRole(UserEvent.Role.Member);
+        userToRemoveEvent.setRole(new Role("Member"));
         when(userEventRepository.findByUserIdAndEventId(userId, eventId))
                 .thenReturn(Optional.of(userToRemoveEvent));
 
@@ -112,11 +112,12 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateRemovePermission_noPermissionToRemoveUser() {
-        requesterUserEvent.setRole(UserEvent.Role.Member);
+        requesterUserEvent.setRole(new Role("Member"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
         UserEvent userToRemoveEvent = new UserEvent();
+        userToRemoveEvent.setRole(new Role("Member"));
         when(userEventRepository.findByUserIdAndEventId(userId, eventId))
                 .thenReturn(Optional.of(userToRemoveEvent));
 
@@ -127,7 +128,7 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateRemovePermission_UserNotInEvent() {
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
@@ -141,12 +142,12 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateEditRolePermission_success() {
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
         UserEvent userToEdit = new UserEvent();
-        userToEdit.setRole(UserEvent.Role.Member);
+        userToEdit.setRole(new Role("Member"));
         when(userEventRepository.findByUserIdAndEventId(userId, eventId))
                 .thenReturn(Optional.of(userToEdit));
 
@@ -156,12 +157,12 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateEditRolePermission_noPermissionToEditRole() {
-        requesterUserEvent.setRole(UserEvent.Role.Member);
+        requesterUserEvent.setRole(new Role("Member"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 
         UserEvent userToEdit = new UserEvent();
-        userToEdit.setRole(UserEvent.Role.Member);
+        userToEdit.setRole(new Role("Member"));
         when(userEventRepository.findByUserIdAndEventId(userId, eventId))
                 .thenReturn(Optional.of(userToEdit));
 
@@ -172,7 +173,7 @@ public class EventSecurityTest {
 
     @Test
     public void testValidateEditRolePermission_UserNotInEvent() {
-        requesterUserEvent.setRole(UserEvent.Role.Admin);
+        requesterUserEvent.setRole(new Role("Admin"));
         when(userEventRepository.findByUserUsernameAndEventId(requesterUsername, eventId))
                 .thenReturn(Optional.of(requesterUserEvent));
 

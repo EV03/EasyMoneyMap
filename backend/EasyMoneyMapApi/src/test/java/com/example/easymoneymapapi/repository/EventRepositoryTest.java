@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,18 +32,18 @@ public class EventRepositoryTest {
     public void setUp() {
         // Common Event setup for multiple tests
         event1 = createEvent("Spring Boot Conference",
-                LocalDate.parse("01.01.2024"),
-                LocalDate.parse("05.01.2024"),
+                LocalDate.parse("01.01.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                LocalDate.parse("05.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 Event.EventStatus.ACTIVE);
 
         event2 = createEvent("Spring Framework Workshop",
-                LocalDate.parse("10.01.2024"),
-                LocalDate.parse("15.01.2024"),
+                LocalDate.parse("10.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                LocalDate.parse("15.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 Event.EventStatus.ACTIVE);
 
         event3 = createEvent("Spring Summit",
-                LocalDate.parse("20.01.2024"),
-                LocalDate.parse("25.01.2024"),
+                LocalDate.parse("20.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                LocalDate.parse("25.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")),
                 Event.EventStatus.PLANNED);
 
         eventRepository.save(event1);
@@ -103,7 +104,8 @@ public class EventRepositoryTest {
     @Test
     @DisplayName("Should find event by dateFrom")
     public void testFindByDateFrom() {
-        List<Event> foundEvents = eventRepository.findByDateFrom(LocalDate.parse("01.01.2024"));
+        List<Event> foundEvents = eventRepository.findByDateFrom(LocalDate.parse("01.01.2024",
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         assertThat(foundEvents).hasSize(1);
         assertThat(foundEvents.get(0).getTitle()).isEqualTo("Spring Boot Conference");
     }
@@ -111,7 +113,8 @@ public class EventRepositoryTest {
     @Test
     @DisplayName("Should find event by dateTo")
     public void testFindByDateTo() {
-        List<Event> foundEvents = eventRepository.findByDateTo(LocalDate.parse("05.01.2024"));
+        List<Event> foundEvents = eventRepository.findByDateTo(LocalDate.parse("05.01.2024",
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         assertThat(foundEvents).hasSize(1);
         assertThat(foundEvents.get(0).getTitle()).isEqualTo("Spring Boot Conference");
     }
@@ -119,7 +122,8 @@ public class EventRepositoryTest {
     @Test
     @DisplayName("Should check if event exists by dateFrom")
     public void testExistsByDateFrom() {
-        Boolean exists = eventRepository.existsByDateFrom(LocalDate.parse("01.01.2024"));
+        Boolean exists = eventRepository.existsByDateFrom(LocalDate.parse("01.01.2024",
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")));
         assertThat(exists).isTrue();
     }
 
@@ -131,8 +135,9 @@ public class EventRepositoryTest {
 
         List<Event> foundEvents = eventRepository
                 .findByTitleContainingIgnoreCaseAndStatusAndDateFromGreaterThanEqualAndDateToLessThanEqual(
-                        "spring", Event.EventStatus.ACTIVE, LocalDate.parse("01.01.2024"),
-                        LocalDate.parse("15.01.2024"));
+                        "spring", Event.EventStatus.ACTIVE, LocalDate.parse("01.01.2024",
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                        LocalDate.parse("15.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         assertThat(foundEvents).hasSize(2);
         assertThat(foundEvents).extracting(Event::getTitle)
@@ -145,8 +150,9 @@ public class EventRepositoryTest {
 
         List<Event> foundEvents = eventRepository
                 .findByTitleContainingIgnoreCaseAndStatusAndDateFromGreaterThanEqualAndDateToLessThanEqual(
-                        "spring", Event.EventStatus.ACTIVE, LocalDate.parse("02.01.2024"),
-                         LocalDate.parse("14.01.2024"));
+                        "spring", Event.EventStatus.ACTIVE, LocalDate.parse("02.01.2024",
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                         LocalDate.parse("14.01.2024",DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 
         assertThat(foundEvents).isEmpty();
     }

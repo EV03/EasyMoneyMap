@@ -134,4 +134,10 @@ class UserServiceTest {
         assertEquals("encodedpassword", userDetails.getPassword());
     }
 
+    @Test
+    void  leaveEvent_UserIsNotCreator() {
+
+
+    }
+
 }

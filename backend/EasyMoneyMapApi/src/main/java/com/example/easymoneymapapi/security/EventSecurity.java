@@ -38,7 +38,7 @@ public class EventSecurity {
             throw new UserAlreadyExistsException("Benutzer mit ID " + userId + " ist bereits im Event.");
         }
 
-        if (!requesterUserEvent.getRole().canAddUser()) {
+        if (!requesterUserEvent.getRole().getRoleLogic().canAddUser()) {
             throw new UnauthorizedAccessException("Benutzer " + requesterUsername
                     + " hat keine Berechtigung, Benutzer hinzuzufügen.");
         }
@@ -48,7 +48,7 @@ public class EventSecurity {
         UserEvent requesterUserEvent = getUserEventOrThrow(requesterUsername, eventId);
         UserEvent userToRemoveEvent = getUserEventOrThrow(userId, eventId);
 
-        if (!requesterUserEvent.getRole().canRemoveUser(userToRemoveEvent.getRole())) {
+        if (!requesterUserEvent.getRole().getRoleLogic().canRemoveUser(userToRemoveEvent.getRole().getRoleLogic())) {
             throw new UnauthorizedAccessException("Benutzer " + requesterUsername
                     + " kann Benutzer mit ID " + userId + " nicht entfernen.");
         }
@@ -60,7 +60,7 @@ public class EventSecurity {
         UserEvent requesterUserEvent = getUserEventOrThrow(requesterUsername, eventId);
         UserEvent userToEdit = getUserEventOrThrow(userId, eventId);
 
-        if (!requesterUserEvent.getRole().canEditUserRole(userToEdit.getRole())) {
+        if (!requesterUserEvent.getRole().getRoleLogic().canEditUserRole(userToEdit.getRole().getRoleLogic())) {
             throw new UnauthorizedAccessException("Benutzer " + requesterUsername
                     + " kann die Rolle von Benutzer mit ID " + userId + " nicht ändern.");
         }
@@ -71,7 +71,7 @@ public class EventSecurity {
     public void validateDeleteEventPermission (long eventId, String requesterUsername) {
         UserEvent requesterUserEvent = getUserEventOrThrow(requesterUsername, eventId);
 
-        if (!requesterUserEvent.getRole().canDeleteEvent()) {
+        if (!requesterUserEvent.getRole().getRoleLogic().canDeleteEvent()) {
             throw new UnauthorizedAccessException("Benutzer " + requesterUsername
                     + " hat keine Berechtigung, das Event zu löschen.");
         }

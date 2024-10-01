@@ -10,6 +10,7 @@ import com.example.easymoneymapapi.repository.EventRepository;
 import com.example.easymoneymapapi.repository.UserEventRepository;
 import com.example.easymoneymapapi.repository.UserRepository;
 import com.example.easymoneymapapi.security.EventSecurity;
+import com.example.easymoneymapapi.security.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -91,7 +92,8 @@ public class UserEventServiceTest {
         userEvent.setUser(user);
         when(eventSecurity.validateEditRolePermission(1L, "requester", 1L))
                 .thenReturn(userEvent);
-        userEventService.setUserRole(1L, 1L, "requester", UserEvent.Role.Admin);
+        userEventService.setUserRole(1L, 1L, "requester",
+                new Role(userEventService.memberEventDefaultRole));
         verify(userEventRepository, times(1)).save(userEvent);
     }
 
