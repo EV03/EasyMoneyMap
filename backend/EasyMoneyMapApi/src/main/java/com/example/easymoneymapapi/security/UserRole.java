@@ -1,5 +1,7 @@
 package com.example.easymoneymapapi.security;
 
+import com.example.easymoneymapapi.model.UserEvent;
+
 public interface UserRole {
 
     boolean canAddUser();
@@ -7,4 +9,6 @@ public interface UserRole {
     boolean canEditEvent();
     boolean canEditUserRole(UserRole userRole);
     boolean canDeleteEvent();
+
+    void editRole(UserEvent userEvent, UserRole currentUserRole);
 }

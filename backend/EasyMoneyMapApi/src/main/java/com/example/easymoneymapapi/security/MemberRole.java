@@ -1,5 +1,7 @@
 package com.example.easymoneymapapi.security;
 
+import com.example.easymoneymapapi.model.UserEvent;
+
 public class MemberRole implements UserRole {
     @Override
     public boolean canAddUser() {
@@ -24,5 +26,12 @@ public class MemberRole implements UserRole {
     @Override
     public boolean canDeleteEvent() {
         return false;
+    }
+
+
+    // sollte nicht aufgerufen werden können, da member keine Rollen ändern kann
+    @Override
+    public void editRole(UserEvent userEvent, UserRole currentUserRole) {
+        return;
     }
 }

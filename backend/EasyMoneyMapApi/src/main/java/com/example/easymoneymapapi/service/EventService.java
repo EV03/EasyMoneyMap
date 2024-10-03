@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 
-// todo: implementieren
+// todo:   edit und create refactoren, unit tests Event service und dann Integration mit controller
 @Service
 public class EventService {
 
@@ -64,7 +64,6 @@ public class EventService {
         return savedEvent ;
         }
 
-        // ab hier in userEventService klasse verschieben
     @Transactional
     public void deleteEvent(long eventId, String byUsername) {
 

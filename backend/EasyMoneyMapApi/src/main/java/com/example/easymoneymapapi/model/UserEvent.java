@@ -1,5 +1,6 @@
 package com.example.easymoneymapapi.model;
 
+import com.example.easymoneymapapi.dto.UserInfoDTO;
 import com.example.easymoneymapapi.security.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,4 +29,9 @@ public class UserEvent {
 
     @Embedded
     private Role role;
+
+    public UserInfoDTO mapToUserInfoDTO() {
+        return new UserInfoDTO(this.getUser().getUsername(),this.getUser().getFirstName(),
+                this.getUser().getLastName(), this.getUser().getEmail(), this.getRole().getName());
+    }
 }

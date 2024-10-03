@@ -151,7 +151,7 @@ public class EventSecurityTest {
         when(userEventRepository.findByUserIdAndEventId(userId, eventId))
                 .thenReturn(Optional.of(userToEdit));
 
-        UserEvent result = eventSecurity.validateEditRolePermission(eventId, requesterUsername, userId);
+        UserEvent result = eventSecurity.validateEditRolePermissionAndEditRole(eventId, requesterUsername, userId);
         assertEquals(userToEdit, result);
     }
 
@@ -167,7 +167,7 @@ public class EventSecurityTest {
                 .thenReturn(Optional.of(userToEdit));
 
         assertThrows(UnauthorizedAccessException.class, () -> {
-            eventSecurity.validateEditRolePermission(eventId, requesterUsername, userId);
+            eventSecurity.validateEditRolePermissionAndEditRole(eventId, requesterUsername, userId);
         });
     }
 
@@ -181,7 +181,7 @@ public class EventSecurityTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(UserInEventNotFoundException.class, () -> {
-            eventSecurity.validateEditRolePermission(eventId, requesterUsername, userId);
+            eventSecurity.validateEditRolePermissionAndEditRole(eventId, requesterUsername, userId);
         });
     }
 }

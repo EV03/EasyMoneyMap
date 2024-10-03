@@ -1,6 +1,7 @@
 package com.example.easymoneymapapi.service;
 
 import com.example.easymoneymapapi.dto.EventDTO;
+import com.example.easymoneymapapi.dto.UserInfoDTO;
 import com.example.easymoneymapapi.exception.EventNotFoundException;
 import com.example.easymoneymapapi.model.Event;
 import com.example.easymoneymapapi.model.UserEvent;
@@ -8,7 +9,9 @@ import com.example.easymoneymapapi.model.UserInfo;
 import com.example.easymoneymapapi.repository.EventRepository;
 import com.example.easymoneymapapi.repository.UserEventRepository;
 import com.example.easymoneymapapi.repository.UserRepository;
+import com.example.easymoneymapapi.security.CreatorRole;
 import com.example.easymoneymapapi.security.Role;
+import com.example.easymoneymapapi.security.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -69,11 +72,10 @@ public class UserEventService {
         userEventRepository.delete(userEventToRemove);
     }
     @Transactional
-    public void setUserRole(long eventId, Long userId, String requesterUsername , Role role) {
+    public void editUserRole(long eventId, Long userId, String requesterUsername) {
         Event event = findEventOrThrow(eventId);
         UserInfo userToEdit = findUserOrThrow(userId);
-        UserEvent userEvent = eventSecurity.validateEditRolePermission (eventId, requesterUsername , userId);
-        userEvent.setRole(role);
+        UserEvent userEvent = eventSecurity.validateEditRolePermissionAndEditRole (eventId, requesterUsername , userId);
         userEventRepository.save(userEvent);
     }
     @Transactional
@@ -85,13 +87,12 @@ public class UserEventService {
         return  userEventRepository.save(userEvent);
     }
 
-    // alle events die ein user besucht mit filtre nach titel, status, dateFrom, dateTo
-    public List<EventDTO> findUserEvents(String requesterUsername, String title, Event.EventStatus status,
+    public List<EventDTO> getEventsOfUser(String requesterUsername, String title, Event.EventStatus status,
                                               String dateFrom, String dateTo) {
         UserInfo user = findUserOrThrow(requesterUsername);
 
         List<UserEvent> userEvents = userEventRepository
-                .findByFilters(user.getId(), title, status, dateFrom, dateTo);
+                .findEventByFilters(user.getId(), title, status, dateFrom, dateTo);
 
         if (userEvents.isEmpty()) {
             throw new EventNotFoundException("Keine Events gefunden");
@@ -102,7 +103,12 @@ public class UserEventService {
                 .toList().stream().map(EventDTO::mapToEventDTO).toList();
     }
 
-    // user will event löschen
+    public List<UserInfoDTO> getUsersOfEvent(long eventId) {
+        Event event = findEventOrThrow(eventId);
+        List<UserEvent> userEvents = userEventRepository.findByEventId(eventId);
+        return userEvents.stream().map(UserEvent::mapToUserInfoDTO).toList();
+    }
+
     @Transactional
     public Event deleteEvent(long eventId, String requesterUsername) {
         Event event = findEventOrThrow(eventId);
@@ -110,14 +116,13 @@ public class UserEventService {
         return event;
     }
 
-    // user will event verlassen
     @Transactional
     public void leaveEvent(long eventId, String requesterUsername) {
 
         Event event = findEventOrThrow(eventId);
         UserInfo requesterUser = findUserOrThrow(requesterUsername);
 
-        UserEvent userEvent = eventSecurity.validateLeaveEventPermission(eventId, requesterUsername);
+        UserEvent requestUserEvent = eventSecurity.validateLeaveEventPermission(eventId, requesterUsername);
 
         List<UserEvent> eventParticipants = userEventRepository.findByEventId(eventId);
 
@@ -128,20 +133,22 @@ public class UserEventService {
 
         // falls der Ersteller das Event verlässt, wird ein neuer Ersteller gesucht
         // neuer Ersteller, ist der erste in der Liste der Teilnehmer (vorerst)
-        if (userEvent.getRole().getName().equals(creatorEventDefaultRole)) {
+        // vergleich mit instanceof da spring den creatorEventDefaultRole mit null initialisiert
+        UserRole requesterRole = requestUserEvent.getRole().getRoleLogic();
+        if (requesterRole instanceof CreatorRole) {
             // Suche nach einem neuen Ersteller (Member oder Admin)
             Optional<UserEvent> newCreator = eventParticipants.stream()
                     .filter(ue -> !ue.getUser().equals(requesterUser))
                     .findFirst();
 
             newCreator.ifPresent(creator -> {
-                creator.setRole(new Role(memberEventDefaultRole));
+                creator.setRole(new Role(creatorEventDefaultRole));
                 userEventRepository.save(creator);
             });
         }
+        // user verlässt Event unabhängig von seiner Rolle
+        userEventRepository.delete(requestUserEvent);
     }
-
-    // alle user aus event todo
 
     public Event findEventOrThrow(long eventId) {
         return eventRepository.findById(eventId)

@@ -1,6 +1,7 @@
 package com.example.easymoneymapapi.controller;
 
 import com.example.easymoneymapapi.dto.EventDTO;
+import com.example.easymoneymapapi.dto.UserInfoDTO;
 import com.example.easymoneymapapi.model.Event;
 import com.example.easymoneymapapi.model.UserInfo;
 import com.example.easymoneymapapi.service.EventService;
@@ -23,7 +24,6 @@ public class EventController {
     @Autowired
     UserEventService userEventService;
 
-    // Liste alle Events auf mit Filtermöglichkeiten
     @GetMapping("/")
     public ResponseEntity<List<EventDTO>> getEvents(
             @RequestParam(required = false) String title,
@@ -32,12 +32,17 @@ public class EventController {
             @RequestParam(required = false) String dateTo,
             Principal principal
     ) {
-       List<EventDTO> events = userEventService.findUserEvents(principal.getName(), title, status, dateFrom, dateTo);
+       List<EventDTO> events = userEventService.getEventsOfUser(principal.getName(), title, status, dateFrom, dateTo);
 
        return ResponseEntity.ok(events);
     }
 
-    // Event erstellen
+    @GetMapping("/{id}/users")
+    public ResponseEntity<List<UserInfoDTO>> getUsers(@PathVariable long id) {
+        List<UserInfoDTO> users = userEventService.getUsersOfEvent(id);
+        return ResponseEntity.ok(users);
+    }
+
     @PostMapping("/")
     public ResponseEntity<EventDTO> createEvent(@Valid @RequestBody EventDTO eventReq, Principal principal) {
         Event createdEvent = eventService.createEvent(eventReq.mapToEvent(), principal.getName());
@@ -51,7 +56,6 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-    // User in Event hinzufügen
     @PostMapping("/{id}/addUser")
     public ResponseEntity<UserInfo> addUserToEvent(@PathVariable long id, @RequestBody Long userId,
                                                    Principal principal) {
@@ -59,7 +63,6 @@ public class EventController {
         return ResponseEntity.ok(addedUser);
     }
 
-    // User aus Event entfernen
     @DeleteMapping("/{id}/removeUser")
     public ResponseEntity<UserInfo> removeUserFromEvent
     ( @PathVariable long id, @RequestBody Long userId, Principal principal) {
@@ -74,5 +77,12 @@ public class EventController {
         Event updatedEvent = eventService.editEvent(id, event.mapToEvent(), principal.getName());
         return ResponseEntity.ok(EventDTO.mapToEventDTO(updatedEvent));
     }
+    @PutMapping("/{id}/editUserRole")
+    public ResponseEntity<String> editUserRole( @PathVariable long id, @RequestBody Long userId,
+                                                 Principal principal) {
+        userEventService.editUserRole(id, userId, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

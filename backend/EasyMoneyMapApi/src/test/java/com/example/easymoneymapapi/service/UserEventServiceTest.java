@@ -1,5 +1,6 @@
 package com.example.easymoneymapapi.service;
 
+import com.example.easymoneymapapi.dto.UserInfoDTO;
 import com.example.easymoneymapapi.exception.EventNotFoundException;
 import com.example.easymoneymapapi.exception.UserAlreadyExistsException;
 import com.example.easymoneymapapi.exception.UserInEventNotFoundException;
@@ -11,19 +12,27 @@ import com.example.easymoneymapapi.repository.UserEventRepository;
 import com.example.easymoneymapapi.repository.UserRepository;
 import com.example.easymoneymapapi.security.EventSecurity;
 import com.example.easymoneymapapi.security.Role;
+import net.bytebuddy.build.ToStringPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.context.TestPropertySource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application.properties")
 public class UserEventServiceTest {
 
     @Mock
@@ -45,7 +54,7 @@ public class UserEventServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    UserInfo user ;
+    UserInfo user;
     Event event;
 
     @BeforeEach
@@ -56,6 +65,7 @@ public class UserEventServiceTest {
         user.setUsername("testuser");
         event = new Event();
         event.setId(1L);
+
     }
 
     @Test
@@ -85,15 +95,14 @@ public class UserEventServiceTest {
     }
 
     @Test
-    public void testSetUserRole() {
+    public void testEditUserRole() {
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
-        when(eventSecurity.validateEditRolePermission(1L, "requester", 1L))
+        when(eventSecurity.validateEditRolePermissionAndEditRole(1L, "requester", 1L))
                 .thenReturn(userEvent);
-        userEventService.setUserRole(1L, 1L, "requester",
-                new Role(userEventService.memberEventDefaultRole));
+        userEventService.editUserRole(1L, 1L, "requester");
         verify(userEventRepository, times(1)).save(userEvent);
     }
 
@@ -115,4 +124,83 @@ public class UserEventServiceTest {
             userEventService.findUserOrThrow("testuser");
         });
     }
+
+    // leave event
+    @Test
+    public void testLeaveEvent_OnlyOneUserInEvent() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        when(userEventRepository.findByEventId(1L)).thenReturn(new ArrayList<>(List.of(userEvent)));
+        when(eventSecurity.validateLeaveEventPermission(1L, "testuser"))
+                .thenReturn(userEvent);
+        userEventService.leaveEvent(1L, user.getUsername());
+        verify(eventRepository, times(1)).delete(event);
+    }
+
+    @Test
+    public void testLeaveEvent_MoreThanOneUserAndUserIsCreator() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setRole(new Role("CREATOR")); // value aus properties file werden nicht korrket gelesen
+        UserEvent userEvent2 = new UserEvent();
+        UserInfo user2 = new UserInfo();
+        userEvent2.setUser(user2);
+        when(userEventRepository.findByEventId(1L)).thenReturn(new ArrayList<>(List.of(userEvent, userEvent2)));
+        when(eventSecurity.validateLeaveEventPermission(1L, "testuser"))
+                .thenReturn(userEvent);
+        userEventService.leaveEvent(1L, user.getUsername());
+        verify(userEventRepository, times(1)).save(userEvent2);
+
+    }
+
+    @Test
+    public void testLeaveEvent_MoreThanOneUserAndUserIsNotCreator() {
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setRole(new Role("MEMBER"));
+        UserEvent userEvent2 = new UserEvent();
+        UserInfo user2 = new UserInfo();
+        userEvent2.setUser(user2);
+        when(userEventRepository.findByEventId(1L)).thenReturn(new ArrayList<>(List.of(userEvent, userEvent2)));
+        when(eventSecurity.validateLeaveEventPermission(1L, "testuser"))
+                .thenReturn(userEvent);
+        userEventService.leaveEvent(1L, user.getUsername());
+        verify(userEventRepository, times(1)).delete(userEvent);
+    }
+
+    @Test
+    public void getUserOfEvents() {
+        UserEvent userEvent2 = new UserEvent();
+        UserEvent userEvent3 = new UserEvent();
+        UserInfo user2 = new UserInfo("username2", "password", "email", "firstName",
+                "lastName");
+        UserInfo user3 = new UserInfo("username3", "password", "email", "firstName",
+                "lastName");
+        userEvent2.setUser(user2);
+        userEvent3.setUser(user3);
+        userEvent2.setRole(new Role("MEMBER"));
+        userEvent3.setRole(new Role("MEMBER"));
+
+        when(userEventRepository.findByEventId(1L)).thenReturn(new ArrayList<>(List.of(userEvent2,userEvent3)));
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        Collection<UserInfoDTO> result = userEventService.getUsersOfEvent(1L);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    public void getEventsOfUser() {
+
+    }
+
 }
+
+
+
+
+

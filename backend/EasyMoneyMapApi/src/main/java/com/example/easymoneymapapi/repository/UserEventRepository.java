@@ -23,7 +23,7 @@ public interface  UserEventRepository extends JpaRepository<UserEvent, Long> {
             "AND (:status IS NULL OR ue.event.status = :status) " +
             "AND (:dateFrom IS NULL OR ue.event.dateFrom >= :dateFrom) " +
             "AND (:dateTo IS NULL OR ue.event.dateTo <= :dateTo)")
-    List<UserEvent> findByFilters(
+    List<UserEvent> findEventByFilters(
             @Param("id") Long id,
             @Param("title") String title,
             @Param("status") Event.EventStatus status,

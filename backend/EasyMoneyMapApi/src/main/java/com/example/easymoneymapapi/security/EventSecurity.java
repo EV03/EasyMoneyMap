@@ -56,15 +56,18 @@ public class EventSecurity {
         return userToRemoveEvent;
     }
 
-    public UserEvent validateEditRolePermission (long eventId, String requesterUsername, Long userId) {
+    public UserEvent validateEditRolePermissionAndEditRole(long eventId, String requesterUsername, Long userId) {
         UserEvent requesterUserEvent = getUserEventOrThrow(requesterUsername, eventId);
         UserEvent userToEdit = getUserEventOrThrow(userId, eventId);
 
-        if (!requesterUserEvent.getRole().getRoleLogic().canEditUserRole(userToEdit.getRole().getRoleLogic())) {
+        UserRole requesterRole = requesterUserEvent.getRole().getRoleLogic();
+        UserRole userToEditRole = userToEdit.getRole().getRoleLogic();
+
+        if (!requesterRole.canEditUserRole(userToEditRole)) {
             throw new UnauthorizedAccessException("Benutzer " + requesterUsername
                     + " kann die Rolle von Benutzer mit ID " + userId + " nicht ändern.");
         }
-
+        userToEditRole.editRole(userToEdit, requesterRole);
         return userToEdit;
     }
 
@@ -76,7 +79,6 @@ public class EventSecurity {
                     + " hat keine Berechtigung, das Event zu löschen.");
         }
     }
-
     public UserEvent validateLeaveEventPermission (long eventId, String requesterUsername) {
 
         return getUserEventOrThrow(requesterUsername, eventId);
