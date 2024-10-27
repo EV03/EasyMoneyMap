@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-// nach urlaub hier weitermachen, filter test
+// nach urlaub hier weitermachen, filter
 @DataJpaTest
 public class UserEventRepositoryTest {
 
@@ -37,9 +37,6 @@ public class UserEventRepositoryTest {
 
         event = new Event();
         event.setTitle("Testevent");
-        event.setStatus(Event.EventStatus.ACTIVE);
-        event.setDateFrom("2023-01-01");
-        event.setDateTo("2023-12-31");
         eventRepository.save(event);
     }
 
@@ -142,9 +139,9 @@ public class UserEventRepositoryTest {
     }
 
     // findByfilters noch testen mit allen möglichen kombinationen von filtern
+
     @Test
     public void findEventByFilters_returnsListOfEvents() {
-
 
 
     }

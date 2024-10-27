@@ -80,7 +80,6 @@ public class EventSecurity {
         }
     }
     public UserEvent validateLeaveEventPermission (long eventId, String requesterUsername) {
-
         return getUserEventOrThrow(requesterUsername, eventId);
 
     }

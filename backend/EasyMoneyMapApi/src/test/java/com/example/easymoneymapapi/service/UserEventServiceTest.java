@@ -2,8 +2,6 @@ package com.example.easymoneymapapi.service;
 
 import com.example.easymoneymapapi.dto.UserInfoDTO;
 import com.example.easymoneymapapi.exception.EventNotFoundException;
-import com.example.easymoneymapapi.exception.UserAlreadyExistsException;
-import com.example.easymoneymapapi.exception.UserInEventNotFoundException;
 import com.example.easymoneymapapi.model.Event;
 import com.example.easymoneymapapi.model.UserEvent;
 import com.example.easymoneymapapi.model.UserInfo;
@@ -12,7 +10,6 @@ import com.example.easymoneymapapi.repository.UserEventRepository;
 import com.example.easymoneymapapi.repository.UserRepository;
 import com.example.easymoneymapapi.security.EventSecurity;
 import com.example.easymoneymapapi.security.Role;
-import net.bytebuddy.build.ToStringPlugin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

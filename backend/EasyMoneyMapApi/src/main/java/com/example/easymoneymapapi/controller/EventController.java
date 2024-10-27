@@ -83,6 +83,4 @@ public class EventController {
         userEventService.editUserRole(id, userId, principal.getName());
         return ResponseEntity.noContent().build();
     }
-
-
 }

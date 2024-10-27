@@ -7,14 +7,12 @@ import com.example.easymoneymapapi.exception.UserAlreadyExistsException;
 import com.example.easymoneymapapi.exception.UserInEventNotFoundException;
 import com.example.easymoneymapapi.model.UserEvent;
 import com.example.easymoneymapapi.repository.UserEventRepository;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+
 
 import java.util.Optional;
 
@@ -184,4 +182,6 @@ public class EventSecurityTest {
             eventSecurity.validateEditRolePermissionAndEditRole(eventId, requesterUsername, userId);
         });
     }
+
+    // delete  testen
 }
